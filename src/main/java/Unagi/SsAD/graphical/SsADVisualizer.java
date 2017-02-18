@@ -30,12 +30,14 @@ public class SsADVisualizer extends JApplet {
     private SSADGraph generatedGraph;
     private JGraphXAdapter<String, DefaultEdge> jgxAdapter;
     private JGraphModelAdapter<String, DefaultEdge> jgAdapter; //new
+    private String title;
 
     private int graphType;
 
-    public SsADVisualizer(SSADGraph generatedGraph, int graphType) {
+    public SsADVisualizer(SSADGraph generatedGraph, int graphType, String title) {
         this.generatedGraph = generatedGraph;
         this.graphType = graphType;
+        this.title = title;
     }
 
 
@@ -58,7 +60,7 @@ public class SsADVisualizer extends JApplet {
         JFrame frame = new JFrame();
         frame.getContentPane().add(this);
 
-        frame.setTitle("SsAD Demo");
+        frame.setTitle(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);

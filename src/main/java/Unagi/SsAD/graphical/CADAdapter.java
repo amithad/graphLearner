@@ -13,7 +13,6 @@ public class CADAdapter extends Observable {
     public CADAdapter(int noOfComponents, int noOfErrorTypes, GraphGenerator graphGen) {
         CADOut = new CADOutput(noOfComponents,noOfErrorTypes);
         this.addObserver(graphGen);
-
     }
 
     public void setCADStatus(int compID, int errorID, int status) { //whenever a CAD State is changed, it's passed on to observers

@@ -42,6 +42,7 @@ public class GraphGenerator extends Thread implements Observer {
         //add functionality here to support multiple graphs.
         if (graphCount > graphList.size()) {
             SSADGraph g = new SSADGraph(CADOut.getCompCount(), CADOut.getErrorCount());
+            //initGraph(g,CADOut.getCompCount(),CADOut.getErrorCount());
             graphList.add(g);
         }
         updateGraph(CADOut, graphList.get(graphCount - 1)); // get the latest graph and update it
@@ -52,7 +53,7 @@ public class GraphGenerator extends Thread implements Observer {
             previousCADOutState = new CADOutput(CADOut.getCompCount(), CADOut.getErrorCount());
             g.initialize();
         }
-        CADOut.displayCADOut(); // temp
+        //CADOut.displayCADOut(); // temp
         findDiff(previousCADOutState, CADOut); //find differences and save in an array list
         addNodesToGraph(g, latestEdits); //generate new graph nodes
         copyCADOut(CADOut, previousCADOutState); //finally
@@ -61,7 +62,7 @@ public class GraphGenerator extends Thread implements Observer {
 
     private void findDiff(CADOutput previous, CADOutput current) {
         previousEdits.clear();
-        latestEdits.forEach(coordinatePair-> previousEdits.add(coordinatePair));
+        latestEdits.forEach(coordinatePair -> previousEdits.add(coordinatePair));
         latestEdits.clear(); //clean previous data before modifications
         for (int i = 0; i < previous.getCompCount(); i++) {
             for (int j = 0; j < previous.getErrorCount(); j++) {
@@ -83,21 +84,24 @@ public class GraphGenerator extends Thread implements Observer {
         latestDiffs.forEach(LcoordinatePair -> {
                     CompErrorNode node = new CompErrorNode(LcoordinatePair[COMP_ID], LcoordinatePair[ERROR_ID]);
                     g.setDetailedGVertex(node, LcoordinatePair[COMP_ID], LcoordinatePair[ERROR_ID]);
-                    previousEdits.forEach(PcoordinatePair-> g.getDetailedJGraph().addEdge(g.getDetailedGVertex(PcoordinatePair[COMP_ID],PcoordinatePair[ERROR_ID]).getNodeID(),node.getNodeID()));
+                    g.addDetailedVertexOnMatrix(LcoordinatePair[COMP_ID], LcoordinatePair[ERROR_ID]);
+                    previousEdits.forEach(PcoordinatePair -> g.getDetailedJGraph().addEdge(g.getDetailedGVertex(PcoordinatePair[COMP_ID], PcoordinatePair[ERROR_ID]).getNodeID(), node.getNodeID()));
+                    previousEdits.forEach(PcoordinatePair -> g.addDetailedEdgeOnMatrix(PcoordinatePair[COMP_ID], PcoordinatePair[ERROR_ID], LcoordinatePair[COMP_ID], LcoordinatePair[ERROR_ID]));
 
-                    if(g.getHighLevelGVertex(LcoordinatePair[COMP_ID])  == null){
+                    if (g.getHighLevelGVertex(LcoordinatePair[COMP_ID]) == null) {
                         CompNode node2 = new CompNode(LcoordinatePair[COMP_ID]);
-                        g.setHighLevelGVertex(node2,LcoordinatePair[COMP_ID]);
+                        g.setHighLevelGVertex(node2, LcoordinatePair[COMP_ID]);
+                        g.addHighLevelVertexOnMatrix(LcoordinatePair[COMP_ID]);
                         ArrayList<Integer> previousComps = new ArrayList<>();
 
-                        previousEdits.forEach(PCoordinatePair->{
-                            if(!previousComps.contains(PCoordinatePair[COMP_ID])) previousComps.add(PCoordinatePair[COMP_ID]);
+                        previousEdits.forEach(PCoordinatePair -> {
+                            if (!previousComps.contains(PCoordinatePair[COMP_ID])) previousComps.add(PCoordinatePair[COMP_ID]);
                         });
-                        previousComps.forEach(PComp-> g.getHighLevelJGraph().addEdge(g.getHighLevelGVertex(PComp).getNodeID(),node2.getNodeID()));
+                        previousComps.forEach(PComp -> g.getHighLevelJGraph().addEdge(g.getHighLevelGVertex(PComp).getNodeID(), node2.getNodeID()));
+                        previousComps.forEach(PComp -> g.addHighLevelEdgeOnMatrix(PComp,LcoordinatePair[COMP_ID]));
 
                     }
                 }
-
         );
 
         System.out.println(g.getDetailedJGraph());
@@ -107,7 +111,7 @@ public class GraphGenerator extends Thread implements Observer {
 
     @Override
     public void run() {
-        System.out.println("Thread started!");
+        System.out.println("Observer Thread started!");
     }
 
     private void copyCADOut(CADOutput source, CADOutput destination) {
@@ -120,11 +124,21 @@ public class GraphGenerator extends Thread implements Observer {
         }
     }
 
-    public SSADGraph getGraph(int i){
-        if(graphList.size()>= i){
-            return graphList.get(i);
+    public void initGraph(SSADGraph g, int noComps, int noErrors) {
+        for (int i = 0; i < noComps; i++) {
+            CompNode n1 = new CompNode(i);
+            g.setHighLevelGVertex(n1, i);
+            for (int j = 0; j < noErrors; j++) {
+                CompErrorNode node = new CompErrorNode(i, j);
+                g.setDetailedGVertex(node, i, j);
+            }
         }
-        else {
+    }
+
+    public SSADGraph getGraph(int i) {
+        if (graphList.size() >= i) {
+            return graphList.get(i);
+        } else {
             System.out.println("hit");
             return null; //Handle exception
         }
