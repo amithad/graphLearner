@@ -1,3 +1,5 @@
+package Unagi.SsAD.graphical;
+
 import Unagi.SsAD.graphical.CADAdapter;
 import Unagi.SsAD.graphical.CADAgent;
 import Unagi.SsAD.graphical.Graph.ExportMatrix;
@@ -35,17 +37,18 @@ public class Main {
         visualizer2.init();
         visualizer2.launch();
 
-        gen1.getGraph(0).exportAdjacency();
+        //gen1.getGraph(0).exportAdjacency(); //print results
+        try {
+            ExportMatrix.writeToFile(gen1.getGraph(0),"Seq1");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             Writer wr1 = new PrintWriter("test.txt","UTF-8");
             ExportMatrix.writeToFile(gen1.getGraph(0).getDetailedJGraph(),wr1);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-
     }
 }

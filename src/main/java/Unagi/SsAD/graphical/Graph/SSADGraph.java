@@ -140,6 +140,22 @@ public class SSADGraph {
         }
     }
 
+    public ArrayList<ArrayList<Integer>> getHighLevelMatrix() {
+        return highLevelMatrix;
+    }
+
+    public ArrayList<ArrayList<Integer>> getDetailedMatrix() {
+        return detailedMatrix;
+    }
+
+    public int getCompCount(){
+        return noOfComponents;
+    }
+
+    public int getErrorTypeCount(){
+        return noOfErrorTypes;
+    }
+
     public synchronized ArrayList<GNode> getDetailedLatest() {
         return detailedLatest;
     }
