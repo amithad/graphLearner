@@ -2,8 +2,11 @@ package Unagi.SsAD.graphical;
 
 import Unagi.SsAD.graphical.Graph.CompErrorNode;
 import Unagi.SsAD.graphical.Graph.CompNode;
+import Unagi.SsAD.graphical.Graph.ExportMatrix;
 import Unagi.SsAD.graphical.Graph.SSADGraph;
+import org.jgrapht.ext.CSVBaseListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -22,6 +25,10 @@ public class GraphGenerator extends Thread implements Observer {
 
     private final int COMP_ID = 0;
     private final int ERROR_ID = 1;
+    public static final int timeOut = 3;
+
+    private long previousTimeStamp;
+    private boolean setChanged = false;
 
     public GraphGenerator() {
         //g = new ListenableDirectedGraph<>(DefaultEdge.class); // create a JGraphT graph
@@ -30,6 +37,7 @@ public class GraphGenerator extends Thread implements Observer {
         latestEdits = new ArrayList<>();
         graphList = new ArrayList<>();
         graphCount = 1;
+        previousTimeStamp = System.currentTimeMillis();
 
     }
 
@@ -39,13 +47,47 @@ public class GraphGenerator extends Thread implements Observer {
     }
 
     private void populateModel(CADOutput CADOut) { //modify this method to make changes to the entire model
-        //add functionality here to support multiple graphs.
+        //add functionality here to support multiple graphs
+        //System.out.println(("Time: "+(System.currentTimeMillis() - previousTimeStamp) / 1000));
         if (graphCount > graphList.size()) {
             SSADGraph g = new SSADGraph(CADOut.getCompCount(), CADOut.getErrorCount());
             //initGraph(g,CADOut.getCompCount(),CADOut.getErrorCount());
             graphList.add(g);
+            //System.out.println(("Time: "+(System.currentTimeMillis() - previousTimeStamp) / 1000));
+        } else if ((System.currentTimeMillis() - previousTimeStamp) / 1000 > timeOut) {
+            //System.out.println("hit2");
+            previousTimeStamp = System.currentTimeMillis();
+            saveGraph();
+            graphCount++;
+            SSADGraph g = new SSADGraph(CADOut.getCompCount(), CADOut.getErrorCount());
+            graphList.add(g);
+            previousEdits.clear();
+            latestEdits.clear();
+            previousCADOutState = null;
         }
         updateGraph(CADOut, graphList.get(graphCount - 1)); // get the latest graph and update it
+        setChanged();
+        saveGraph();
+    }
+
+    private void setChanged(){
+        setChanged = true;
+    }
+
+    public boolean isSetChanged(){
+        return setChanged;
+    }
+
+    public void resetSetChanged(){
+        setChanged = false;
+    }
+
+    public void saveGraph(){
+        try {
+            ExportMatrix.writeToFile(getGraph(graphCount - 1), "Seq" + (graphCount - 1));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateGraph(CADOutput CADOut, SSADGraph g) {
@@ -98,7 +140,7 @@ public class GraphGenerator extends Thread implements Observer {
                             if (!previousComps.contains(PCoordinatePair[COMP_ID])) previousComps.add(PCoordinatePair[COMP_ID]);
                         });
                         previousComps.forEach(PComp -> g.getHighLevelJGraph().addEdge(g.getHighLevelGVertex(PComp).getNodeID(), node2.getNodeID()));
-                        previousComps.forEach(PComp -> g.addHighLevelEdgeOnMatrix(PComp,LcoordinatePair[COMP_ID]));
+                        previousComps.forEach(PComp -> g.addHighLevelEdgeOnMatrix(PComp, LcoordinatePair[COMP_ID]));
 
                     }
                 }
@@ -142,5 +184,9 @@ public class GraphGenerator extends Thread implements Observer {
             System.out.println("hit");
             return null; //Handle exception
         }
+    }
+
+    public int getGraphCount(){
+        return graphCount;
     }
 }

@@ -30,15 +30,14 @@ public class CADAgent extends Thread {
         adapter.notifyGenerator();
 
         try{
-            //sleep(20000);
+            sleep(6000);
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        //adapter.setCADStatus(4,3,1);
-
-        //adapter.setCADStatus(2,1,1);
-        //adapter.notifyGenerator();
-
+        adapter.setCADStatus(4,3,1);
+        adapter.notifyGenerator();
+        adapter.setCADStatus(2,1,1);
+        adapter.notifyGenerator();
     }
 }

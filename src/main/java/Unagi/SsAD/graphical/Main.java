@@ -18,20 +18,21 @@ public class Main {
     public static void main(String[] args) {
 
         GraphGenerator gen1 = new GraphGenerator();
-        CADAdapter adapter1 = new CADAdapter(5,4, gen1);
+        //CSVMan csvMan1 = new CSVMan(gen1);
+        CADAdapter adapter1 = new CADAdapter(5, 4, gen1);
         CADAgent agent1 = new CADAgent(adapter1);
         gen1.start();
+        //csvMan1.start();
         agent1.start();
 
-        try{
+        try {
             sleep(2000);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        SsADVisualizer visualizer1 = new SsADVisualizer(gen1.getGraph(0), DETAILED_GRAPH,"Component-Error Graph");
-        SsADVisualizer visualizer2 = new SsADVisualizer(gen1.getGraph(0), HIGHLEVEL_GRAPH,"Components Graph");
+        SsADVisualizer visualizer1 = new SsADVisualizer(gen1.getGraph(0), DETAILED_GRAPH, "Component-Error Graph");
+        SsADVisualizer visualizer2 = new SsADVisualizer(gen1.getGraph(0), HIGHLEVEL_GRAPH, "Components Graph");
         visualizer1.init();
         visualizer1.launch();
         visualizer2.init();
@@ -39,16 +40,16 @@ public class Main {
 
         //gen1.getGraph(0).exportAdjacency(); //print results
         try {
-            ExportMatrix.writeToFile(gen1.getGraph(0),"Seq1");
+            ExportMatrix.writeToFile(gen1.getGraph(gen1.getGraphCount() - 1), "Seq" + (gen1.getGraphCount() - 1));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        try {
+        /*try {
             Writer wr1 = new PrintWriter("test.txt","UTF-8");
             ExportMatrix.writeToFile(gen1.getGraph(0).getDetailedJGraph(),wr1);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

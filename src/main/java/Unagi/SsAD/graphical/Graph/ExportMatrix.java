@@ -37,6 +37,15 @@ public class ExportMatrix {
         if (gType == GraphType.HIGH_LEVEL_GRAPH) {
             wr1 = new PrintWriter("Graphs/" + filePrefix + "_HighLevel.csv", "UTF-8");
             writeMatrix = g.getHighLevelMatrix();
+            String columnNames = "";
+            for (int i = 0; i < writeMatrix.size(); i++) {
+                if (writeMatrix.get(i).get(0) == -1) //if vertices do not exist
+                    linesToIgnore.add(i);
+                else {
+                    columnNames +=(!columnNames.equals("") ? "," : "") + "C"+i;
+                }
+            }
+            wr1.append(columnNames).append("\n");
         }
         if (gType == GraphType.DETAILED_GRAPH) {
             wr1 = new PrintWriter("Graphs/" + filePrefix + "_Detailed.csv", "UTF-8");
