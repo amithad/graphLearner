@@ -33,6 +33,7 @@ public class SsADVisualizer extends JApplet {
     private String title;
 
     private int graphType;
+    private JGraph j1;
 
     public SsADVisualizer(SSADGraph generatedGraph, int graphType, String title) {
         this.generatedGraph = generatedGraph;
@@ -59,14 +60,19 @@ public class SsADVisualizer extends JApplet {
     public void launch() {
         JFrame frame = new JFrame();
         frame.getContentPane().add(this);
+        //frame.getRootPane().add(this);
+        //JPanel panel = new JPanel();
+        //panel.getRootPane().add(this);
+        //panel.add(this);
 
         frame.setTitle(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+        //return j1;
     }
 
-    public void init() {
+    public void initialize() {
 
         if (generatedGraph != null) {
             // create a visualization using JGraph, via an adapter
@@ -74,10 +80,11 @@ public class SsADVisualizer extends JApplet {
             if (graphType == HIGHLEVEL_GRAPH) jgAdapter = new JGraphModelAdapter<>(generatedGraph.getHighLevelJGraph());
 
             JGraph jgraph = new JGraph(jgAdapter);
-
+            //j1 = jgraph;
             adjustDisplaySettings(jgraph);
             getContentPane().add(jgraph);
             resize(DEFAULT_SIZE);
+
             //positionVertexAt(v1, 130, 40);
             
         }
