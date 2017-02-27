@@ -31,11 +31,14 @@ public class GraphAnalyzer extends Thread {
     public void run() {
         try {
             sleep(2000);
-            if (gen.getGraphCount() == 2) {
-                printMatrix(gen.getGraph(1).getDetailedMatrix());
+            if (gen.getGraphCount() == 1) {
+                printMatrix(gen.getGraph(0).getDetailedMatrix());
             }
             System.out.println('\n');
             printMatrix(loadRule(RULE_PATH + "Rule0_Detailed.csv", DETAILED));
+            System.out.println("Analysis:");
+            float confidence = compareGraph(gen.getGraph(0).getDetailedMatrix(),loadRule(RULE_PATH + "Rule0_Detailed.csv", DETAILED));
+            System.out.println(confidence);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
@@ -47,6 +50,27 @@ public class GraphAnalyzer extends Thread {
         GraphAnalyzer g1 = new GraphAnalyzer(null);
         g1.printMatrix(g1.loadRule(RULE_PATH + "Rule0_Detailed.csv", DETAILED));
         //g1.loadRule(RULE_PATH + "Rule0_Detailed.csv", DETAILED);
+    }
+
+    public float compareGraph(ArrayList<ArrayList<Integer>> generatedGraph, ArrayList<ArrayList<Integer>> inputRule){
+        if(generatedGraph.size()==inputRule.size()){
+            float totalErrors = 0;
+            float correctOptions = 0;
+            for (int i = 0; i < generatedGraph.size(); i++) {
+                for (int j = 0; j < generatedGraph.size(); j++) {
+                    if(inputRule.get(i).get(j)==1){
+                        totalErrors++;
+                        if(generatedGraph.get(i).get(j)==1){
+                            correctOptions++;
+                        }
+                    }
+                }
+            }
+            if(totalErrors!=0){
+                return correctOptions/totalErrors;
+            }
+        }
+        return -1;
     }
 
     public ArrayList<ArrayList<Integer>> loadRule(String fileName, int type) throws IOException {
